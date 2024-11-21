@@ -1,5 +1,5 @@
 
-# **Bioimaging Metadata Schema Generator**
+# **Bioimaging Metadata Schema Generator  (OME RESEARCH)**
 
 ### **Project Overview**
 This project provides tools and scripts to convert complex bioimaging metadata (e.g., from Excel/CSV files) into structured **LinkML schemas**. The goal is to enable interoperability, validation, and semantic integration of microscopy metadata for research and analysis.
