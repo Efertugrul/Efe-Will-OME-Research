@@ -1,0 +1,204 @@
+id: https://example.org/MicroscopyMetadata
+name: MicroscopyMetadata
+description: Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications
+prefixes:
+  linkml: https://w3id.org/linkml/
+  xsd: http://www.w3.org/2001/XMLSchema#
+default_prefix: microscopy
+types:
+  float_with_unit:
+    base: float
+    description: A floating-point number with an optional unit
+  boolean:
+    base: bool
+    description: A true or false value
+
+enums:
+  ObjectiveCorrection:
+    permissible_values:
+      Achro: {}
+      Achromat: {}
+      Apo: {}
+      Apochromat: {}
+      Plan: {}
+      SuperFluor: {}
+      Other: {}
+
+  ImmersionTypeList:
+    permissible_values:
+      Air: {}
+      Water: {}
+      Glycerol: {}
+      Silicone_Oil: {}
+      Other: {}
+
+  ContrastModulationPlate:
+    permissible_values:
+      None: {}
+      Ph1: {}
+      Ph2: {}
+      Ph3: {}
+      Other: {}
+
+  ObjectiveLightType:
+    permissible_values:
+      Infrared: {}
+      Ultraviolet: {}
+      Visible: {}
+
+  CorrectionCollarTypeList:
+    permissible_values:
+      Coverglass_Thickness: {}
+      Immersion_Liquid: {}
+      Numerical_Aperture: {}
+      Temperature: {}
+      Multi: {}
+
+  PhaseContrastDesignationType:
+    permissible_values:
+      Phase: {}
+      PC: {}
+      Ph1: {}
+      Ph2: {}
+      Other: {}
+
+classes:
+  Instrument:
+    description: Represents an instrument containing multiple objectives
+    slots:
+      - objectives
+
+  Objective:
+    description: Represents an objective in the instrument
+    attributes:
+      ID:
+        description: Unique identifier for the objective
+        range: string
+        required: true
+      Magnification:
+        description: Magnification of the objective
+        range: float_with_unit
+        required: true
+      LensNA:
+        description: Numerical Aperture (NA) of the objective
+        range: float_with_unit
+        required: true
+      Correction:
+        description: Type of optical correction
+        range: ObjectiveCorrection
+        required: true
+      ImmersionType:
+        description: General category of the immersion liquid
+        range: ImmersionTypeList
+      WorkingDistance:
+        description: Distance between the objective and the specimen
+        range: float_with_unit
+        required: true
+      Iris:
+        description: Whether the objective is fitted with an iris
+        range: boolean
+        required: true
+      CalibratedMagnification:
+        description: Magnification as measured by calibration
+        range: float_with_unit
+      AnnotationRef:
+        description: Reference to an annotation
+        range: AnnotationRef
+      Name:
+        description: User-defined name for the objective
+        range: string
+      InfinityCorrected:
+        description: Whether the objective is infinity corrected
+        range: boolean
+        required: true
+      ContrastModulation:
+        description: Type of contrast modulation plate
+        range: ContrastModulationPlate
+        required: true
+      DIC:
+        description: Whether the objective supports Differential Interference Contrast
+        range: boolean
+        required: true
+      LightType:
+        description: Type of light supported by the objective
+        range: ObjectiveLightType
+      CorrectionCollar:
+        description: Whether the objective has a correction collar
+        range: boolean
+        required: true
+      CorrectionCollarType:
+        description: Type of correction collar
+        range: CorrectionCollarTypeList
+      DippingMedium:
+        description: Type of dipping medium compatible with the objective
+        range: string
+      PhaseContrastDesignation:
+        description: Designation of the phase contrast plate
+        range: PhaseContrastDesignationType
+      ObjectiveViewField:
+        description: Diameter of the view field in mm
+        range: float_with_unit
+      ImageDistance:
+        description: Distance to the primary image plane
+        range: float_with_unit
+        required: true
+      FrontFocalLength:
+        description: Distance to the front focal plane
+        range: float_with_unit
+      BackFocalLength:
+        description: Distance to the rear focal plane
+        range: float_with_unit
+      ParfocalizingDistance:
+        description: Distance between the mounting plane and specimen plane
+        range: float_with_unit
+
+  ManufacturerSpecs:
+    description: Specifications about the manufacturer
+    attributes:
+      Manufacturer:
+        description: Name of the manufacturer
+        range: string
+        required: true
+      Model:
+        description: Model name or designation
+        range: string
+        required: true
+      CatalogNumber:
+        description: Catalog or serial number
+        range: string
+        required: true
+      LotNumber:
+        description: Lot number for production
+        range: string
+
+  AnnotationRef:
+    description: Reference to an annotation
+    attributes:
+      ID:
+        description: ID of the annotation
+        range: string
+      Namespace:
+        description: Namespace of the annotation
+        range: string
+      Annotator:
+        description: Annotator of the annotation
+        range: string
+
+  VendorBinData:
+    description: Vendor-specific binary data
+    attributes:
+      Compression:
+        description: Compression format
+        range: string
+      BigEndian:
+        description: Whether the data is in big-endian format
+        range: boolean
+      Length:
+        description: Length of the binary data
+        range: float
+
+slots:
+  objectives:
+    description: Objectives associated with an instrument
+    range: Objective
+    multivalued: true
