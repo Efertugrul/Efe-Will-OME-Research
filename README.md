@@ -61,37 +61,35 @@ Use the cleaned metadata to generate a LinkML schema:
 python src/generator.py --input data/cleaned.csv --output data/output.yaml
 ```
 
----
 
-## **Example Input and Output**
 
-### **Input Metadata (Excel/CSV)**
-| Tier | Description              | Data type | Allowed values | Cardinality/Required? |
-|------|--------------------------|-----------|----------------|------------------------|
-| 1    | Microscope Stand         | string    |                | R                     |
-| 1    | Objective Magnification  | integer   | 10,20,40       | 1                     |
-
-### **Generated LinkML Schema (YAML)**
+### **LinkML Schema (YAML)**
 ```yaml
-id: microscopy_metadata
 name: MicroscopyMetadata
-description: Schema for structured microscopy metadata
-classes:
-  Microscope:
-    description: Represents a microscope and its components
-    attributes:
-      microscope_stand:
-        description: The stand holding the microscope components
-        range: string
-        required: true
-      objective_magnification:
-        description: The magnification of the objective lens
-        range: integer
-        required: true
-        values:
-          - 10
-          - 20
-          - 40
+description: Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications
+prefixes:
+  linkml: https://w3id.org/linkml/
+  xsd: http://www.w3.org/2001/XMLSchema#
+default_prefix: microscopy
+types:
+  float_with_unit:
+    base: float
+    description: A floating-point number with an optional unit
+  boolean:
+    base: bool
+    description: A true or false value
+
+enums:
+  ObjectiveCorrection:
+    permissible_values:
+      Achro: {}
+      Achromat: {}
+      Apo: {}
+      Apochromat: {}
+      Plan: {}
+      SuperFluor: {}
+      Other: {}
+
 ```
 
 ---
