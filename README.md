@@ -1,5 +1,5 @@
 
-# **Bioimaging Metadata Schema Generator**
+# **Bioimaging Metadata Schema Generator (OME RESEARCH METADATA SPECS)**
 
 ### **Project Overview**
 This project provides tools and scripts to convert complex bioimaging metadata (e.g., from Excel/CSV files) into structured **LinkML schemas**. The goal is to enable interoperability, validation, and semantic integration of microscopy metadata for research and analysis.
@@ -63,15 +63,8 @@ python src/generator.py --input data/cleaned.csv --output data/output.yaml
 
 ---
 
-## **Example Input and Output**
 
-### **Input Metadata (Excel/CSV)**
-| Tier | Description              | Data type | Allowed values | Cardinality/Required? |
-|------|--------------------------|-----------|----------------|------------------------|
-| 1    | Microscope Stand         | string    |                | R                     |
-| 1    | Objective Magnification  | integer   | 10,20,40       | 1                     |
-
-### **Generated LinkML Schema (YAML)**
+### **Generated LinkML Schema (YAML)  (Subject to Change)**
 ```yaml
 id: microscopy_metadata
 name: MicroscopyMetadata
@@ -94,16 +87,7 @@ classes:
           - 40
 ```
 
----
 
-## **Contributing**
-Contributions are welcome! Please follow these steps to contribute:
-1. Fork the repository.
-2. Create a new feature branch.
-3. Commit your changes.
-4. Submit a pull request.
-
----
 
 ## **License**
 This project is licensed under the MIT License.
