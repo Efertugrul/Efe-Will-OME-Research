@@ -1,5 +1,5 @@
 
-# **Bioimaging Metadata Schema Generator (OME RESEARCH METADATA SPECS)**
+# **Bioimaging Metadata Schema Generator  (OME RESEARCH)**
 
 ### **Project Overview**
 This project provides tools and scripts to convert complex bioimaging metadata (e.g., from Excel/CSV files) into structured **LinkML schemas**. The goal is to enable interoperability, validation, and semantic integration of microscopy metadata for research and analysis.
@@ -61,33 +61,55 @@ Use the cleaned metadata to generate a LinkML schema:
 python src/generator.py --input data/cleaned.csv --output data/output.yaml
 ```
 
----
 
 
-### **Generated LinkML Schema (YAML)  (Subject to Change)**
+### **LinkML Schema (YAML)**
 ```yaml
-id: microscopy_metadata
 name: MicroscopyMetadata
-description: Schema for structured microscopy metadata
-classes:
-  Microscope:
-    description: Represents a microscope and its components
-    attributes:
-      microscope_stand:
-        description: The stand holding the microscope components
-        range: string
-        required: true
-      objective_magnification:
-        description: The magnification of the objective lens
-        range: integer
-        required: true
-        values:
-          - 10
-          - 20
-          - 40
+description: Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications
+prefixes:
+  linkml: https://w3id.org/linkml/
+  xsd: http://www.w3.org/2001/XMLSchema#
+default_prefix: microscopy
+types:
+  float_with_unit:
+    base: float
+    description: A floating-point number with an optional unit
+  boolean:
+    base: bool
+    description: A true or false value
+
+enums:
+  ObjectiveCorrection:
+    permissible_values:
+      Achro: {}
+      Achromat: {}
+      Apo: {}
+      Apochromat: {}
+      Plan: {}
+      SuperFluor: {}
+      Other: {}
+
 ```
 
+---
 
+## **Contributing**
+Contributions are welcome! Please follow these steps to contribute:
+1. Fork the repository.
+2. Create a new feature branch.
+3. Commit your changes.
+4. Submit a pull request.
+
+---
 
 ## **License**
 This project is licensed under the MIT License.
+
+---
+
+### **Verification**
+- The manually created **reference YAML file** was successfully verified using the LinkML verifier, with no issues found.
+- Once the Python scripts are functional, the output YAML from the Excel-to-YAML converter can be directly compared to the reference format using LinkML packages.
+- This ensures that the converter's output aligns with the required schema standards.
+
