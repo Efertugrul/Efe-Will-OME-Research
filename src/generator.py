@@ -2,7 +2,6 @@ import csv
 import yaml
 
 def csv_to_linkml(csv_filename, yaml_filename):
-    # Initialize the schema dictionary
     schema = {
         'id': 'https://example.org/MicroscopyMetadata',
         'name': 'MicroscopyMetadata',
@@ -21,16 +20,13 @@ def csv_to_linkml(csv_filename, yaml_filename):
                 'base': 'bool',
                 'description': 'A true or false value'
             },
-            'Extension_of_Reference': {  # Custom type
-                'base': 'string',
+            'Extension_of_Reference': {  'base': 'string',
                 'description': 'Reference to an annotation'
             },
-            'Denomination': {  # Custom type
-                'base': 'string',
+            'Denomination': { 'base': 'string',
                 'description': 'User-defined name type'
             },
-            'LSID': {  # Assuming LSID is a string type
-                'base': 'string',
+            'LSID': {  'base': 'string',
                 'description': 'Life Science Identifier (LSID)'
             }
         },
@@ -56,7 +52,6 @@ def csv_to_linkml(csv_filename, yaml_filename):
         current_class = None
         
         for row in reader:
-            # Skip rows that don't have AttributeName or Description
             if not row.get('AttributeName') and not row.get('Description'):
                 continue
             
@@ -68,9 +63,6 @@ def csv_to_linkml(csv_filename, yaml_filename):
             allowed_values = row.get('Allowed values', '').strip()
             complex_type = row.get('Complex type', '').strip()
             cardinality = row.get('Cardinality/Required?', '').strip()
-            
-            # Detect if the row defines a new class
-            # Assuming that classes have an AttributeName but no Data type and no Complex type
             if attribute_name and not data_type and not complex_type:
                 current_class = attribute_name
                 schema['classes'][current_class] = {
@@ -79,25 +71,19 @@ def csv_to_linkml(csv_filename, yaml_filename):
                 }
                 continue
             
-            # If there's no current class, skip the row
             if not current_class:
                 continue
-            
-            # Prepare attribute entry
             attr_entry = {
                 'description': description
             }
             
-            # Handle tier as a separate property
             if tier:
                 try:
                     attr_entry['tier'] = int(tier)
                 except ValueError:
-                    attr_entry['tier'] = tier  # Keep as string if not integer
+                    attr_entry['tier'] = tier 
             
-            # Handle cardinality as a separate property
             if cardinality:
-                # Determine if multivalued based on cardinality string
                 if '...' in cardinality or '∞' in cardinality or 'multiple' in cardinality.lower():
                     attr_entry['multivalued'] = True
                 else:
@@ -112,7 +98,6 @@ def csv_to_linkml(csv_filename, yaml_filename):
             
             if data_type.lower() == 'enum' and allowed_values:
                 enum_name = complex_type if complex_type else f"{attribute_name}Enum"
-                # Clean enum values by replacing spaces with underscores
                 enum_values = [value.strip().replace(' ', '_') for value in allowed_values.split(',')]
                 enums[enum_name] = {
                     'permissible_values': {value: {} for value in enum_values}
@@ -129,19 +114,15 @@ def csv_to_linkml(csv_filename, yaml_filename):
             elif data_type.lower() == 'extension of reference':
                 attr_entry['range'] = 'Extension_of_Reference'
             else:
-                attr_entry['range'] = 'string'  # Default to string if unspecified
-            
-            # Add attribute to the current class
+                attr_entry['range'] = 'string' 
             schema['classes'][current_class]['attributes'][attribute_name] = attr_entry
 
-    # Add enums to the schema
     schema['enums'] = enums
 
-    # Write the schema to a YAML file
     with open(yaml_filename, 'w', encoding='utf-8') as yamlfile:
         yaml.dump(schema, yamlfile, sort_keys=False, allow_unicode=True)
 
 if __name__ == '__main__':
     csv_filename = 'NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv'
-    yaml_filename = 'output.yaml'  # Output LinkML schema file
+    yaml_filename = 'output.yaml' 
     csv_to_linkml(csv_filename, yaml_filename)
