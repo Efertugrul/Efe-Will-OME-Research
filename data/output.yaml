@@ -173,8 +173,8 @@ classes:
         multivalued: false
         range: string
     tier: 1
-  ManufactuerSpecs:
-    description: Additional ManufactuerSpecs attributes and Sub-elements are listed
+  ManufacturerSpecs:
+    description: Additional ManufacturerSpecs attributes and Sub-elements are listed
       in the main NBO_MicroscopyMetadataSpecifications_ALL_v02-10.xlsx document (https://github.com/WU-BIMAC/NBOMicroscopyMetadataSpecs/blob/master/Model/in%20progress/v02-10/NBO_MicroscopyMetadataSpecifications_ALL_v02-10.xlsx)
     attributes:
       ID:
