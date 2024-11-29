@@ -194,5 +194,5 @@ def csv_to_linkml(csv_filename, yaml_filename):
 
 if __name__ == '__main__':
     csv_filename = 'NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv' 
-    yaml_filename = 'output2.yaml'
+    yaml_filename = 'output.yaml'
     csv_to_linkml(csv_filename, yaml_filename)
