@@ -1,78 +1,147 @@
-import pandas as pd
-#Subject to change
-def preprocess_and_normalize(file_path):
-    df = pd.read_excel(file_path, sheet_name=0, engine="openpyxl")
+import csv
+import yaml
 
-    df["Tier"] = df["Tier"].fillna(method="ffill")
-    df["Description"] = df["Description"].fillna("") 
-    parent_class = None
-    normalized_data = []
-
-    for _, row in df.iterrows():
-        tier = row["Tier"]
-        description = row["Description"]
-        data_type = row.get("Data type", "string")
-        allowed_values = row.get("Allowed values", None)
-        cardinality = row.get("Cardinality/Required?", None)
-
-        if tier.isnumeric(): 
-            parent_class = description.strip()
-            normalized_data.append({
-                "Class": parent_class,
-                "Parent Class": None,
-                "Description": description,
-                "Attribute": None,
-                "Data Type": None,
-                "Cardinality": None,
-                "Allowed Values": None,
-            })
-        else:
-            normalized_data.append({
-                "Class": parent_class,
-                "Parent Class": None,
-                "Description": description,
-                "Attribute": description.strip(),
-                "Data Type": data_type.strip() if isinstance(data_type, str) else "string",
-                "Cardinality": cardinality.strip() if isinstance(cardinality, str) else None,
-                "Allowed Values": allowed_values.strip() if isinstance(allowed_values, str) else None,
-            })
-    normalized_df = pd.DataFrame(normalized_data)
-    return normalized_df
-
-
-def generate_linkml_from_normalized(normalized_df, output_file):
-    from yaml import safe_dump
-
+def csv_to_linkml(csv_filename, yaml_filename):
+    # Initialize the schema dictionary
     schema = {
-        "id": "microscopy_metadata",
-        "name": "MicroscopyMetadata",
-        "description": "Reduced schema for microscopy metadata",
-        "classes": {},
+        'id': 'https://example.org/MicroscopyMetadata',
+        'name': 'MicroscopyMetadata',
+        'description': 'Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications',
+        'prefixes': {
+            'linkml': 'https://w3id.org/linkml/',
+            'xsd': 'http://www.w3.org/2001/XMLSchema#'
+        },
+        'default_prefix': 'microscopy',
+        'types': {
+            'float_with_unit': {
+                'base': 'float',
+                'description': 'A floating-point number with an optional unit'
+            },
+            'boolean': {
+                'base': 'bool',
+                'description': 'A true or false value'
+            },
+            'Extension_of_Reference': {  # Custom type
+                'base': 'string',
+                'description': 'Reference to an annotation'
+            },
+            'Denomination': {  # Custom type
+                'base': 'string',
+                'description': 'User-defined name type'
+            },
+            'LSID': {  # Assuming LSID is a string type
+                'base': 'string',
+                'description': 'Life Science Identifier (LSID)'
+            }
+        },
+        'enums': {},
+        'classes': {},
+        'slots': {},
+        'annotations': {
+            'tier': {
+                'description': 'Tier level indicating the depth or importance of the attribute',
+                'range': 'integer'
+            },
+            'cardinality': {
+                'description': 'Cardinality indicating the multiplicity of the attribute',
+                'range': 'string'
+            }
+        }
     }
 
-    for _, row in normalized_df.iterrows():
-        class_name = row["Class"]
-        if class_name not in schema["classes"]:
-            schema["classes"][class_name] = {
-                "description": row["Description"],
-                "attributes": {}
+    enums = {}
+    with open(csv_filename, 'r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        
+        current_class = None
+        
+        for row in reader:
+            # Skip rows that don't have AttributeName or Description
+            if not row.get('AttributeName') and not row.get('Description'):
+                continue
+            
+            tier = row.get('Tier', '').strip()
+            required = row.get('Required?', '').strip().lower()
+            attribute_name = row.get('AttributeName', '').strip()
+            description = row.get('Description', '').strip()
+            data_type = row.get('Data type', '').strip()
+            allowed_values = row.get('Allowed values', '').strip()
+            complex_type = row.get('Complex type', '').strip()
+            cardinality = row.get('Cardinality/Required?', '').strip()
+            
+            # Detect if the row defines a new class
+            # Assuming that classes have an AttributeName but no Data type and no Complex type
+            if attribute_name and not data_type and not complex_type:
+                current_class = attribute_name
+                schema['classes'][current_class] = {
+                    'description': description,
+                    'attributes': {}
+                }
+                continue
+            
+            # If there's no current class, skip the row
+            if not current_class:
+                continue
+            
+            # Prepare attribute entry
+            attr_entry = {
+                'description': description
             }
-        if pd.notna(row["Attribute"]):
-            attr_name = row["Attribute"].lower().replace(" ", "_")
-            schema["classes"][class_name]["attributes"][attr_name] = {
-                "description": row["Description"],
-                "range": row["Data Type"],
-                "required": row["Cardinality"] == "R", 
-            }
-            if pd.notna(row["Allowed Values"]):
-                schema["classes"][class_name]["attributes"][attr_name]["values"] = row["Allowed Values"].split(",")
+            
+            # Handle tier as a separate property
+            if tier:
+                try:
+                    attr_entry['tier'] = int(tier)
+                except ValueError:
+                    attr_entry['tier'] = tier  # Keep as string if not integer
+            
+            # Handle cardinality as a separate property
+            if cardinality:
+                # Determine if multivalued based on cardinality string
+                if '...' in cardinality or '∞' in cardinality or 'multiple' in cardinality.lower():
+                    attr_entry['multivalued'] = True
+                else:
+                    attr_entry['multivalued'] = False
+                attr_entry['cardinality'] = cardinality
+            else:
+                attr_entry['multivalued'] = False 
+                attr_entry['cardinality'] = 'NULL' 
+            
+            if required in ['y', 'yes', 'r', 'required']:
+                attr_entry['required'] = True
+            
+            if data_type.lower() == 'enum' and allowed_values:
+                enum_name = complex_type if complex_type else f"{attribute_name}Enum"
+                # Clean enum values by replacing spaces with underscores
+                enum_values = [value.strip().replace(' ', '_') for value in allowed_values.split(',')]
+                enums[enum_name] = {
+                    'permissible_values': {value: {} for value in enum_values}
+                }
+                attr_entry['range'] = enum_name
+            elif 'float' in data_type.lower():
+                attr_entry['range'] = 'float_with_unit'
+            elif data_type.lower() == 'boolean':
+                attr_entry['range'] = 'boolean'
+            elif data_type.lower() == 'lsid':
+                attr_entry['range'] = 'LSID'
+            elif data_type.lower() == 'denomination':
+                attr_entry['range'] = 'Denomination'
+            elif data_type.lower() == 'extension of reference':
+                attr_entry['range'] = 'Extension_of_Reference'
+            else:
+                attr_entry['range'] = 'string'  # Default to string if unspecified
+            
+            # Add attribute to the current class
+            schema['classes'][current_class]['attributes'][attribute_name] = attr_entry
 
-    with open(output_file, "w") as f:
-        safe_dump(schema, f, sort_keys=False)
+    # Add enums to the schema
+    schema['enums'] = enums
 
-    print(f"Schema saved to {output_file}")
+    # Write the schema to a YAML file
+    with open(yaml_filename, 'w', encoding='utf-8') as yamlfile:
+        yaml.dump(schema, yamlfile, sort_keys=False, allow_unicode=True)
 
-input_file = "../data/NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.xlsx"
-output_file = "../data/generated_schema.yaml"
-normalized_df = preprocess_and_normalize(input_file)
-generate_linkml_from_normalized(normalized_df, output_file)
+if __name__ == '__main__':
+    csv_filename = 'NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv'
+    yaml_filename = 'output.yaml'  # Output LinkML schema file
+    csv_to_linkml(csv_filename, yaml_filename)
