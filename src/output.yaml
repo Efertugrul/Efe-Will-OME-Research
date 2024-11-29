@@ -162,7 +162,7 @@ classes:
           is not "Air", the actual Immersion Liquid that was used during the Acquisition
           of a specific Image must be specified in Objective Settings.
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: ImmersionTypeList
       WorkingDistance:
         description: This field reports the Working Distance of this Objective under
@@ -187,7 +187,7 @@ classes:
         description: This field captures the Magnification of the Objective as measured
           via a calibration process- i.e., '59.987' for a 60x lens.
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: float_with_unit
       AnnotationRef:
         description: This is an empty element that refers to an Annotation (typically
@@ -199,7 +199,7 @@ classes:
       Name:
         description: A User-defined Name for this component.
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: Denomination
       InfinityCorrected:
         description: This field records whether (True) or not (False) this Objective
@@ -231,7 +231,7 @@ classes:
         description: This field specifies whether this Objective is designed for a
           special Light application (e.g., IR or UV).
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         required: true
         range: ObjectiveLightType
       CorrectionCollar:
@@ -252,7 +252,7 @@ classes:
           Objective is fitted. In case the Objective has more than one Correction
           Collar please enter "Multi" and provide more details in Description.
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: CorrectionCollarTypeList
       DippingMedium:
         description: In case the Immersion Type for this Objective is designated as
@@ -263,7 +263,7 @@ classes:
           Benzyl Benzoate and BB-PEG (PEGASOS); Benzyl Alcohol, Benzyl Benzoate (BABB);
           dibenzyl ether (DBE); 100% Ethanol].
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: DippingType
       PhaseContrastDesignation:
         description: 'If the Objective is designed for Phase, this field specifies
@@ -272,7 +272,7 @@ classes:
           This designation has to match the Phase Number of the Phase Ring associated
           with the front focal plane of the Condenser.'
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: PhaseContrastDesignationType
       ObjectiveViewField:
         description: 'This field records the maximal diameter of the view field allowed
@@ -294,20 +294,20 @@ classes:
           axis from the front principal plane of this Lens to the front focal plane
           (F).
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: float_with_unit
       BackFocalLength:
         description: This field records the distance (f') measured along the optical
           axis from the rear principal plane of this Lens to the rear focal plane
           (F').
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: float_with_unit
       ParfocalizingDistance:
         description: This field records the distance between the mounting plane of
           this Objective and the specimen plane.
         multivalued: false
-        cardinality: '1'
+        cardinality: 'NULL'
         range: float_with_unit
 slots: {}
 annotations:
