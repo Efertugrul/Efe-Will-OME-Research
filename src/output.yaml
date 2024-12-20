@@ -171,7 +171,19 @@ classes:
       Channel elements associated with a given Image Acquisition session. It is understood
       that the Light Path configuration can be different for each Channel, but cannot
       be different for each timepoint or each Plane of an XYZ stack.
-    attributes: {}
+    attributes:
+      Objective:
+        description: The Microscope's Objective lens consists of a lens, its mount,
+          and any associated parts. It is the part of the imaging system, which forms
+          a primary image of the object, either alone or in conjunction with a tube
+          lens. The Objective typically consists of a compound lens consisting of
+          several simple lenses (elements), usually arranged along a common axis.
+        range: microscopy.Objective
+        required: true
+        multivalued: true
+        annotations:
+          tier: 1
+          M&M: true
   Objective:
     description: The Microscope's Objective lens consists of a lens, its mount, and
       any associated parts. It is the part of the imaging system, which forms a primary
@@ -294,7 +306,7 @@ classes:
         annotations:
           tier: 2
           M&M: false
-        range: string
+        range: microscopy.float_with_unit
       Iris:
         description: This field records whether (True) or not (False) the Objective
           was fitted with an Iris. Manufacturers offer high NA Objectives, which are
@@ -317,7 +329,7 @@ classes:
         annotations:
           tier: 2
           M&M: false
-        range: float
+        range: microscopy.float_with_unit
       AnnotationRef:
         description: This is an empty element that refers to an Annotation (typically
           a Comment Annotation that consists of a simple multi-line comment) describing
@@ -441,7 +453,7 @@ classes:
         annotations:
           tier: 3
           M&M: false
-        range: float
+        range: microscopy.float_with_unit
       ImageDistance:
         description: This field records the distance in air between the rear principal
           plane of this Objective and the primary Image plane.
@@ -450,7 +462,7 @@ classes:
         annotations:
           tier: 3
           M&M: false
-        range: float
+        range: microscopy.float_with_unit
       FrontFocalLength:
         description: This field records the distance (f) measured along the optical
           axis from the front principal plane of this Lens to the front focal plane

@@ -5,19 +5,19 @@ from ruamel.yaml import YAML
 
 def parse_csv(file_path):
   
-    with open(file_path, newline='', encoding='utf-8') as csvfile:
+    with open(file_path, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         return list(reader)
 
 def determine_multivalued(cardinality):
-  
+ 
     if not cardinality:
         return False
     return '...' in cardinality or '∞' in cardinality or 'multi' in cardinality.lower()
 
 def main():
-    input_csv = "../data/NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv"  
-    output_yaml = 'output.yaml'  
+    input_csv = "../data/NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv" 
+    output_yaml = 'output.yaml' 
 
     yaml_dict = {
         'id': 'https://example.org/MicroscopyMetadata',
@@ -81,7 +81,7 @@ def main():
 
     for enum_name, values in enums.items():
         yaml_dict['enums'][enum_name] = {
-            'description': '',  
+            'description': '',
             'permissible_values': values
         }
 
@@ -95,12 +95,12 @@ def main():
 
     classes = {}
     current_class = None
-    print(rows[0].keys())
+
     for row in rows:
         data_type = row['Data type'].strip()
         attribute_name = row['AttributeName'].strip()
         description = row['Description'].strip()
-        tier = row['\ufeffTier'].strip()
+        tier = row.get('Tier', row.get('\ufeffTier', '')).strip() 
         required = row['Required?'].strip().upper() == 'Y'
         allowed_values = row['Allowed values'].strip()
         complex_type = row['Complex type'].strip()
@@ -128,7 +128,8 @@ def main():
         }
 
         if complex_type:
-            attr['range'] = f'microscopy.{complex_type}'
+            corrected_complex_type = complex_type.replace('ManufactuerSpecs', 'ManufacturerSpecs')
+            attr['range'] = f'microscopy.{corrected_complex_type}'
         elif allowed_values:
             enum_name = attribute_name
             attr['range'] = f'microscopy.{enum_name}'
@@ -145,7 +146,26 @@ def main():
     for class_name, class_info in classes.items():
         yaml_dict['classes'][class_name] = class_info
 
- 
+    if 'Objective' in classes and 'Instrument' in classes:
+        yaml_dict['classes']['Instrument']['attributes']['Objective'] = {
+            'description': 'The Microscope\'s Objective lens consists of a lens, its mount, and any associated parts. It is the part of the imaging system, which forms a primary image of the object, either alone or in conjunction with a tube lens. The Objective typically consists of a compound lens consisting of several simple lenses (elements), usually arranged along a common axis.',
+            'range': 'microscopy.Objective',
+            'required': True,
+            'multivalued': True,
+            'annotations': {
+                'tier': 1,
+                'M&M': True
+            }
+        }
+
+    for class_info in yaml_dict['classes'].values():
+        for attr_name, attr_info in class_info['attributes'].items():
+      
+            if attr_name in ['WorkingDistance', 'ObjectiveViewField', 'ImageDistance']:
+                attr_info['range'] = 'microscopy.float_with_unit'
+            if attr_name == 'CalibratedMagnification':
+                attr_info['range'] = 'microscopy.float_with_unit'
+
     for enum_name in yaml_dict['enums']:
         if not yaml_dict['enums'][enum_name]['description']:
             yaml_dict['enums'][enum_name]['description'] = f'Types of {enum_name}'
