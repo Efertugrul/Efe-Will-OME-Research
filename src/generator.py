@@ -64,10 +64,6 @@ def main():
             'cardinality': {
                 'description': 'Cardinality indicating the multiplicity of the attribute',
                 'range': 'string'
-            },
-            'multivalued': {
-                'description': 'Indicates if the attribute can have multiple values',
-                'range': 'boolean'
             }
         },
         'classes': {}

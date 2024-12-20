@@ -77,13 +77,6 @@ enums:
       Silicone Oil: {}
       Water: {}
       Other: {}
-  None:
-    description: This field reports the Working Distance of this Objective under normal
-      operating conditions. The Working Distance is the distance (in air, or in the
-      specified immersion liquid) between the front of an Objective and the surface
-      of the cover glass or of the specimen if uncovered.
-    permissible_values:
-      None: {}
   ContrastModulationPlate:
     description: This field specifies the presence in this Objective of a contrast
       modulation plate, such as a Phase Ring (Ph1, Ph2, Ph3), a Hoffman modulator,
@@ -162,9 +155,6 @@ slots:
   cardinality:
     description: Cardinality indicating the multiplicity of the attribute
     range: string
-  multivalued:
-    description: Indicates if the attribute can have multiple values
-    range: boolean
 classes:
   Instrument:
     description: This element describes the Instrument used to capture the Image.
@@ -304,7 +294,7 @@ classes:
         annotations:
           tier: 2
           M&M: false
-        range: microscopy.None
+        range: string
       Iris:
         description: This field records whether (True) or not (False) the Objective
           was fitted with an Iris. Manufacturers offer high NA Objectives, which are
