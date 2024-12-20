@@ -1,0 +1,425 @@
+id: https://example.org/MicroscopyMetadata
+name: MicroscopyMetadata
+description: Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications
+prefixes:
+  linkml: https://w3id.org/linkml/
+  xsd: http://www.w3.org/2001/XMLSchema#
+default_prefix: microscopy
+types:
+  float_with_unit:
+    base: float
+    description: A floating-point number with an optional unit
+  boolean:
+    base: bool
+    description: A true or false value
+  Extension_of_Reference:
+    base: string
+    description: Reference to an annotation
+  Denomination:
+    base: string
+    description: User-defined name type
+  LSID:
+    base: string
+    description: Life Science Identifier (LSID)
+enums:
+  ObjectiveCorrection:
+    permissible_values:
+      Achro: {}
+      Achromat: {}
+      Achroplan: {}
+      Acroplan: {}
+      Apo: {}
+      Apochromat: {}
+      C-Achroplan: {}
+      EF: {}
+      Fl: {}
+      Fluar: {}
+      Fluor: {}
+      Fluotar: {}
+      Lambda: {}
+      N: {}
+      Neofluar: {}
+      NPL: {}
+      Pl: {}
+      Plan: {}
+      Plano: {}
+      PlanApo: {}
+      PlanApochromat: {}
+      PlanFluor: {}
+      PlanNeofluar: {}
+      SuperFluor: {}
+      UPLAN: {}
+      UPlanApo: {}
+      UPlanFl: {}
+      UV: {}
+      VioletCorrected: {}
+      Other: {}
+  ImmersionTypeList:
+    permissible_values:
+      Air: {}
+      Dipping: {}
+      Glycerol: {}
+      Multi: {}
+      Mineral_Oil: {}
+      Silicone_Oil: {}
+      Water: {}
+      Other: {}
+  ContrastModulationPlate:
+    permissible_values:
+      None: {}
+      Ph1: {}
+      Ph2: {}
+      Ph3: {}
+      Hoffman: {}
+      VAREL: {}
+      Other: {}
+  ObjectiveLightType:
+    permissible_values:
+      Infrared: {}
+      Ultraviolet: {}
+      Visible: {}
+  CorrectionCollarTypeList:
+    permissible_values:
+      Coverglass_Thickness: {}
+      Immersion_Liquid: {}
+      Numerical_Aperture: {}
+      Temperature: {}
+      Multi: {}
+  DippingType:
+    permissible_values:
+      Organic_based: {}
+      Water_based: {}
+      Other: {}
+  PhaseContrastDesignationType:
+    permissible_values:
+      Phase: {}
+      PHACO: {}
+      PC: {}
+      PhL: {}
+      Ph1: {}
+      Ph2: {}
+      Ph3: {}
+      Ph4: {}
+      DL: {}
+      DLL: {}
+      DM: {}
+      ADL: {}
+      PL: {}
+      PLL: {}
+      PM: {}
+      PH: {}
+      NL: {}
+      NM: {}
+      BM: {}
+      NH: {}
+classes:
+  Instrument:
+    description: This element describes the Instrument used to capture the Image.
+      It is primarily a container referring to the list of hardware components included
+      in a given Microscope. The list consists of the Microscope Stand, Microscope
+      Table, Light Source, Light Source Coupling, Sample Holder, Focusing, Objective,
+      Filter, Dichroic, Additional Lens (including a commonly used Magnification Changer,
+      also known as Optovar), Additional Mirroring Device, Polarization Optics, Prism,
+      Optical Aperture, Optical Device, Detector and Calibration Tool. The Filter
+      element can be either composed of separate Excitation, Emission filters, and
+      Dichroic mirrors or a single Filter Set. An Instrument might have multiple Light
+      Sources, Detectors, Objectives, and Filters, etc. Each of these has its own
+      ID attribute, which can be referred to from the Image, Plane or more commonly
+      Channel elements associated with a given Image Acquisition session. It is understood
+      that the Light Path configuration can be different for each Channel, but cannot
+      be different for each timepoint or each Plane of an XYZ stack.
+    attributes:
+      Objective:
+        description: The Microscope's Objective lens consists of a lens, its mount,
+          and any associated parts. It is the part of the imaging system, which forms
+          a primary image of the object, either alone or in conjunction with a tube
+          lens. The Objective typically consists of a compound lens consisting of
+          several simple lenses (elements), usually arranged along a common axis.
+        M&M: true
+        tier: 1
+        range: Manufacturer Specs
+        cardinality: 1 ... ∞
+        multivalued: true
+      Manufacturer:
+        description: The company, research group or individual who manufactured this
+          hardware component.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: string
+      Model:
+        description: The Model name or any other designation the Manufacturer uses
+          for this component.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: string
+      CatalogNumber:
+        description: The Catalog, Part or Serial Number used by the Manufacturer to
+          uniquely identify this component.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: string
+      LotNumber:
+        description: The Lot Number used by the Manufacturer to refer to a specific
+          production batch or lot for this component.
+        M&M: false
+        tier: 3
+        cardinality: 'NULL'
+        multivalued: false
+        range: string
+    tier: 1
+  ManufacturerSpecs:
+    description: Additional ManufacturerSpecs attributes and Sub-elements are listed
+      in the main NBO_MicroscopyMetadataSpecifications_ALL_v02-10.xlsx document (https://github.com/WU-BIMAC/NBOMicroscopyMetadataSpecs/blob/master/Model/in%20progress/v02-10/NBO_MicroscopyMetadataSpecifications_ALL_v02-10.xlsx)
+    attributes:
+      ID:
+        description: A Unique Identifier for this component.
+        M&M: false
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: LSID
+      Magnification:
+        description: This field captures the Magnification of the Objective as specified
+          by the Manufacturer - i.e., 60 represents a 60X lens.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: float_with_unit
+      LensNA:
+        description: This field captures the nominal Numerical Aperture (NA) of this
+          Objective as specified by the Manufacturer, expressed as a floating-point
+          (real) number (e.g. 1.27 NA). NA is a number that was defined initially
+          by Abbe to characterize Objectives and Condensers. NA can be calculated
+          by the expression n sin alpha, where n is the Refractive Index of the medium
+          between the Lens and the Sample, and alpha is half the Angular Aperture
+          of the Lens. NA is a measure of how much of the illumination that leaves
+          the specimen actually passes through the Lens. The larger the NA, the more
+          information the lens can transmit. Expected range 0.02 - 1.5.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: float_with_unit
+      Correction:
+        description: This field captures the type of optical correction (i.e. chromatic
+          correction, or flatness correction, etc.) associated with this Objective.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: ObjectiveCorrection
+      ImmersionType:
+        description: According to ISO 10934-1:2002, an Immersion Liquid is a liquid
+          (commonly immersion oil, water or glycerol) specified as suitable for use
+          in the space between the front of an immersion lens and the object NOTE
+          Because the immersion liquid is considered in the computing of corrections
+          to be part of the lens, its refractive index and dispersion (or Abbe number)
+          are critical. Please refer to ISO 8036-1 for more details on Immersion Oil.
+          This field describes the general category of the Immersion Liquid this Objective
+          is designed for, according to the Manufacturer. If the general category
+          is not "Air", the actual Immersion Liquid that was used during the Acquisition
+          of a specific Image must be specified in Objective Settings.
+        M&M: false
+        tier: 1
+        cardinality: 'NULL'
+        multivalued: false
+        range: ImmersionTypeList
+      WorkingDistance:
+        description: This field reports the Working Distance of this Objective under
+          normal operating conditions. The Working Distance is the distance (in air,
+          or in the specified immersion liquid) between the front of an Objective
+          and the surface of the cover glass or of the specimen if uncovered.
+        M&M: false
+        tier: 2
+        cardinality: R
+        multivalued: false
+        range: float_with_unit
+      Iris:
+        description: This field records whether (True) or not (False) the Objective
+          was fitted with an Iris. Manufacturers offer high NA Objectives, which are
+          equipped with an internal Iris Diaphragm that increases image contrast during
+          digital imaging to compensate for image flare artifacts due to light emitted
+          from areas outside the focal plane. Opening or closing the Iris Diaphragm
+          determines the size of the Objective rear aperture yielding a variable NA
+          range between 0.5 and the Objective's upper limit.
+        M&M: false
+        tier: 2
+        cardinality: R
+        multivalued: false
+        range: boolean
+      CalibratedMagnification:
+        description: This field captures the Magnification of the Objective as measured
+          via a calibration process- i.e., '59.987' for a 60x lens.
+        M&M: false
+        tier: 2
+        cardinality: 'NULL'
+        multivalued: false
+        range: float_with_unit
+      AnnotationRef:
+        description: This is an empty element that refers to an Annotation (typically
+          a Comment Annotation that consists of a simple multi-line comment) describing
+          this component.
+        M&M: false
+        tier: 1
+        cardinality: 0 ... ∞
+        multivalued: true
+        range: Extension_of_Reference
+      Name:
+        description: A User-defined Name for this component.
+        M&M: false
+        tier: 1
+        cardinality: 'NULL'
+        multivalued: false
+        range: Denomination
+      InfinityCorrected:
+        description: This field records whether (True) or not (False) this Objective
+          is infinity corrected. An Infinity-corrected Objective is corrected for
+          an infinite sample to primary image distance and needs to be used with a
+          Tube Lens of appropriate focal length to obtains its nominal magnification.
+        M&M: false
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: boolean
+      ContrastModulation:
+        description: This field specifies the presence in this Objective of a contrast
+          modulation plate, such as a Phase Ring (Ph1, Ph2, Ph3), a Hoffman modulator,
+          a Varel modulator, or similar.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: ContrastModulationPlate
+      DIC:
+        description: This field specifies whether (True) the Objective is designed
+          for Differential Interference Contrast (DIC) or not (False). DIC is a contrast
+          modality due to double-beam interference in which two waves that fall on
+          the object plane or image plane are separated laterally by a distance similar
+          to the minimum resolvable distance.
+        M&M: true
+        tier: 1
+        cardinality: R
+        multivalued: false
+        range: boolean
+      LightType:
+        description: This field specifies whether this Objective is designed for a
+          special Light application (e.g., IR or UV).
+        M&M: true
+        tier: 1
+        cardinality: 'NULL'
+        multivalued: false
+        range: ObjectiveLightType
+      CorrectionCollar:
+        description: This field records whether (True) or not (False) the Objective
+          was fitted with a Correction Collar. When using high NA dry Objectives (NA
+          0.8 or greater), cover glass thickness variations of only a few micrometers,
+          immersion medium, and temperature changes result in dramatic image degradation
+          due to aberration. To compensate for these errors, the more highly corrected
+          Objectives are equipped with a Correction Collar mechanism, which is provided
+          to adjust the central lens group position to compensate for deviations from
+          correct optical path length due to changes in Cover Glass Thickness, the
+          nature of the Immersion Liquid, different Numerical Apertures, and Temperature.
+        M&M: false
+        tier: 2
+        cardinality: R
+        multivalued: false
+        range: boolean
+      CorrectionCollarType:
+        description: This field records the type of Correction Collar with which this
+          Objective is fitted. In case the Objective has more than one Correction
+          Collar please enter "Multi" and provide more details in Description.
+        M&M: false
+        tier: 2
+        cardinality: 'NULL'
+        multivalued: false
+        range: CorrectionCollarTypeList
+      DippingMedium:
+        description: In case the Immersion Type for this Objective is designated as
+          "Dipping", this field captures the type of Dipping Medium this Objective
+          is compatible with. Examples include, water-based (biological buffers, culture
+          media, other water-based solutions) organic-based [FocusClear (CLARITY);
+          CUBIC-1, CUBIC-2, CUBIC-R1, CUBIC-R2; 2,2-thiodiethanol (TDE); ethyl cinnamate;
+          Benzyl Benzoate and BB-PEG (PEGASOS); Benzyl Alcohol, Benzyl Benzoate (BABB);
+          dibenzyl ether (DBE); 100% Ethanol].
+        M&M: false
+        tier: 2
+        cardinality: 'NULL'
+        multivalued: false
+        range: DippingType
+      PhaseContrastDesignation:
+        description: 'If the Objective is designed for Phase, this field specifies
+          the Phase Contrast designation of the Phase Plate found in this Objective
+          (see: https://www.microscopyu.com/techniques/phase-contrast/phase-contrast-Microscope-configuration).
+          This designation has to match the Phase Number of the Phase Ring associated
+          with the front focal plane of the Condenser.'
+        M&M: false
+        tier: 2
+        cardinality: 'NULL'
+        multivalued: false
+        range: PhaseContrastDesignationType
+      ObjectiveViewField:
+        description: 'This field records the maximal diameter of the view field allowed
+          by this Objective, expressed in mm, and measured at the intermediate image
+          plane. NB: The field of view is influenced by the magnification and diameter
+          of the ocular (eyepiece) field diaphragm, but also by the limits imposed
+          by the design of the Objective.'
+        M&M: false
+        tier: 3
+        cardinality: R
+        multivalued: false
+        range: float_with_unit
+      ImageDistance:
+        description: This field records the distance in air between the rear principal
+          plane of this Objective and the primary Image plane.
+        M&M: false
+        tier: 3
+        cardinality: R
+        multivalued: false
+        range: float_with_unit
+      FrontFocalLength:
+        description: This field records the distance (f) measured along the optical
+          axis from the front principal plane of this Lens to the front focal plane
+          (F).
+        M&M: false
+        tier: 3
+        cardinality: 'NULL'
+        multivalued: false
+        range: float_with_unit
+      BackFocalLength:
+        description: This field records the distance (f') measured along the optical
+          axis from the rear principal plane of this Lens to the rear focal plane
+          (F').
+        M&M: false
+        tier: 3
+        cardinality: 'NULL'
+        multivalued: false
+        range: float_with_unit
+      ParfocalizingDistance:
+        description: This field records the distance between the mounting plane of
+          this Objective and the specimen plane.
+        M&M: false
+        tier: 3
+        cardinality: 'NULL'
+        multivalued: false
+        range: float_with_unit
+    tier: 3
+slots:
+  tier:
+    description: Tier level indicating the depth or importance
+    range: integer
+  M&M:
+    description: Indicates if the attribute is required
+    range: boolean
+  cardinality:
+    description: Cardinality indicating the multiplicity of the attribute
+    range: string
+  multivalued:
+    description: Indicates if the attribute can have multiple values
+    range: boolean
