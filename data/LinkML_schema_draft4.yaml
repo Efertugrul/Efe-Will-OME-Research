@@ -140,6 +140,7 @@ classes:
           It forms a primary image of the object, either alone or with a tube lens. Typically,
           it consists of a compound lens with several simple lenses arranged along a common axis.
         range: microscopy.ManufacturerSpecs
+        # cardinality is represented by required and multivalued attribute
         required: true
         multivalued: true
         annotations:
