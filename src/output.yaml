@@ -172,24 +172,19 @@ classes:
       that the Light Path configuration can be different for each Channel, but cannot
       be different for each timepoint or each Plane of an XYZ stack.
     attributes:
-      Objective:
-        description: The Microscope's Objective lens consists of a lens, its mount,
-          and any associated parts. It is the part of the imaging system, which forms
-          a primary image of the object, either alone or in conjunction with a tube
-          lens. The Objective typically consists of a compound lens consisting of
-          several simple lenses (elements), usually arranged along a common axis.
-        range: microscopy.Objective
-        required: true
-        multivalued: true
-        annotations:
-          tier: 1
-          M&M: true
+      Objective: {}
   Objective:
     description: The Microscope's Objective lens consists of a lens, its mount, and
       any associated parts. It is the part of the imaging system, which forms a primary
       image of the object, either alone or in conjunction with a tube lens. The Objective
       typically consists of a compound lens consisting of several simple lenses (elements),
       usually arranged along a common axis.
+    range: microscopy.ManufacturerSpecs
+    required: true
+    multivalued: true
+    annotations:
+      tier: 1
+      M&M: true
     attributes:
       Manufacturer:
         description: The company, research group or individual who manufactured this

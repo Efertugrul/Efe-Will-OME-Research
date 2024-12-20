@@ -147,15 +147,18 @@ def main():
         yaml_dict['classes'][class_name] = class_info
 
     if 'Objective' in classes and 'Instrument' in classes:
-        yaml_dict['classes']['Instrument']['attributes']['Objective'] = {
+        yaml_dict['classes']['Instrument']['attributes']['Objective'] = {}
+        
+        yaml_dict['classes']['Objective'] = {
             'description': 'The Microscope\'s Objective lens consists of a lens, its mount, and any associated parts. It is the part of the imaging system, which forms a primary image of the object, either alone or in conjunction with a tube lens. The Objective typically consists of a compound lens consisting of several simple lenses (elements), usually arranged along a common axis.',
-            'range': 'microscopy.Objective',
+            'range': 'microscopy.ManufacturerSpecs',
             'required': True,
             'multivalued': True,
             'annotations': {
                 'tier': 1,
                 'M&M': True
-            }
+            },
+            'attributes': yaml_dict['classes']['Objective']['attributes']
         }
 
     for class_info in yaml_dict['classes'].values():
