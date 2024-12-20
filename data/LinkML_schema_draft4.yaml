@@ -94,7 +94,7 @@ enums:
   DippingType:
     description: Types of dipping mediums compatible with objectives
     permissible_values:
-      Organic_based: {}  # Changed to use underscore instead of hyphen
+      Organic_based: {}  
       Water_based: {}
       Other: {}
   PhaseContrastDesignationType:
