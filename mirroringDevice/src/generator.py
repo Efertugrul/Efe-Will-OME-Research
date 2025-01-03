@@ -4,74 +4,77 @@ from collections import defaultdict
 from ruamel.yaml import YAML
 
 def parse_csv(file_path):
-    """
-    Reads the CSV file and returns a list of dictionaries,
-    one for each row, keyed by column headers (the same as the raw CSV).
-    """
+  
     with open(file_path, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         return list(reader)
 
 def determine_multivalued(cardinality):
-    """
-    Returns True if the CSV row's 'Cardinality/Required?' suggests a multi-valued slot
-    (e.g. '1..∞', '1 ... ∞', 'Many', 'multi', etc.).
-    Adjust or expand logic as needed.
-    """
+   
     if not cardinality:
         return False
-    cardinality_lower = cardinality.lower()
-    return ('∞' in cardinality_lower or '...' in cardinality_lower or 'multi' in cardinality_lower or 'many' in cardinality_lower)
+    return '...' in cardinality or '∞' in cardinality or 'multi' in cardinality.lower()
 
 def main():
-    input_csv = "../data/mirrorDev_correct.csv" 
-    output_yaml = "mirroringdevice_schema.yaml"
+    input_csv = "../data/mirrorDev_correct.csv"  
+    output_yaml = 'output_schema.yaml'            
 
-  
     yaml_dict = {
-        'id': 'https://example.org/MicroscopyMetadata',
-        'name': 'MicroscopyMetadata_MirroringDevice',
-        'description': 'Schema for OME Core vs. NBO Basic Extension: MirroringDevice & related hardware',
+        'id': 'https://example.org/MicroscopyMetadata',  
+        'name': 'MicroscopyMetadata',
+        'description': 'Schema for OME Core vs. NBO Basic Extension OBJECTIVE Hardware Specifications',
         'prefixes': {
             'linkml': 'https://w3id.org/linkml/',
             'xsd': 'http://www.w3.org/2001/XMLSchema#',
-            'microscopy': 'https://example.org/microscopy#'
+            'microscopy': 'https://example.org/microscopy#' 
         },
         'default_prefix': 'microscopy',
         'types': {
             'float_with_unit': {
                 'base': 'float',
-                'description': 'A floating-point number that may include a unit (e.g., 45 deg, 1.5 mm, etc.)'
+                'description': 'A floating-point number with an optional unit (e.g., 1.27 NA, 60X)'
             },
-            'percentFraction_with_unit_none': {
+            'percentFraction_with_unit': {
                 'base': 'float',
-                'description': 'A fraction between 0.0 and 1.0, representing e.g. transmittance or reflectance.'
+                'description': 'A fractional value representing a percentage (0.0 to 1.0) with an optional unit'
             },
-            'positiveFloat_with_unit': {
-                'base': 'float',
-                'description': 'A positive floating-point number with an associated wavelength or length unit.'
+            'boolean': {
+                'base': 'bool',
+                'description': 'A true or false value'
             },
             'Extension_of_Reference': {
                 'base': 'string',
-                'description': 'A reference to some annotation or external resource'
+                'description': 'Reference to an annotation or external resource'
             },
-            'LDIS': {
+            'Denomination': {
                 'base': 'string',
-                'description': 'Potential custom type for an LSID or LDIS, as indicated by your CSV'
+                'description': 'User-defined name type for custom identifiers'
+            },
+            'LSID': {
+                'base': 'string',
+                'description': 'Life Science Identifier (LSID) used for unique identification'
+            },
+            'nonNegativeFloat': {
+                'base': 'float',
+                'description': 'A floating-point number that is zero or positive'
+            },
+            'positiveFloat_with_unit': {
+                'base': 'float',
+                'description': 'A positive floating-point number with an optional unit'
             }
         },
         'enums': {},
         'slots': {
-            'Tier': {
-                'description': 'Tier level indicating the depth or importance.',
+            'tier': {
+                'description': 'Tier level indicating the depth or importance',
                 'range': 'integer'
             },
-            'M&M': {
-                'description': 'Indicates if the attribute is required (Y/N).',
+            'Required': { 
+                'description': 'Indicates if the attribute is required',
                 'range': 'boolean'
             },
-            'Cardinality': {
-                'description': 'Cardinality indicating the multiplicity of the attribute (e.g., 1..∞).',
+            'cardinality': {
+                'description': 'Cardinality indicating the multiplicity of the attribute',
                 'range': 'string'
             }
         },
@@ -80,119 +83,116 @@ def main():
 
     rows = parse_csv(input_csv)
 
-
-    enums_dict = defaultdict(set)  
+    enums = {}
     for row in rows:
-        allowed_vals = row.get("Allowed values", "").strip()
-        if allowed_vals:
-            splitted = [val.strip() for val in allowed_vals.split(",") if val.strip()]
-            enum_name = row.get("Complex type", "").strip() or row.get("Data type", "").strip()
-            if enum_name and splitted:
-                for val in splitted:
-                    enums_dict[enum_name].add(val)
+        allowed_values = row['Allowed values'].strip()
+        if allowed_values:
+            print(row)
+            enum_name = row['Complex type'].strip() if row['Complex type'].strip() else row['AttributeName'].strip()
+            enum_values = [value.strip() for value in allowed_values.split(',')]
+            enums[enum_name] = {value: {} for value in enum_values}
 
-    for enum_name, values in enums_dict.items():
-        if not enum_name:
-            enum_name = "UnnamedEnum"
+    for enum_name, values in enums.items():
         yaml_dict['enums'][enum_name] = {
-            'description': f'Enum for {enum_name}',
-            'permissible_values': {val: {} for val in sorted(values)}
+            'description': '',  
+            'permissible_values': values
         }
 
+    for row in rows:
+        allowed_values = row['Allowed values'].strip()
+        if allowed_values:
+            enum_name = row['Complex type'].strip() if row['Complex type'].strip() else row['AttributeName'].strip()
+            description = row['Description'].strip()
+            if enum_name in yaml_dict['enums']:
+                yaml_dict['enums'][enum_name]['description'] = description
 
     classes = {}
     current_class = None
 
-   
     for row in rows:
-        data_type = row.get("Data type", "").strip()
-        desc = row.get("Description", "").strip()
-        cardinality = row.get("Cardinality/Required?", "").strip()
-        mm = row.get("M&M", "").upper().strip() 
+        data_type = row['Data type'].strip()
+        attribute_name = row['AttributeName'].strip()
+        description = row['Description'].strip()
+        tier = row.get('Tier', row.get('\ufeffTier', '')).strip() 
+        required = row['Required?'].strip().upper() == 'Y'
+        allowed_values = row['Allowed values'].strip()
+        complex_type = row['Complex type'].strip()
+        cardinality = row['Cardinality/Required?'].strip()
 
         if data_type == '-':
- 
-            possible_class_names = []
-            for col_idx in ["Tier","M&M","Description","Data type","Allowed values","Complex type"]:
-                pass
-
-       
-            row_values = list(row.values())
-            class_name = None
-            for val in row_values:
-                val_str = (val or "").strip()
-            
-                if val_str and val_str not in [
-                    "-", "R", "Y", "e,e", "Substitution", "choose one child from the list below",
-                    "substitution group (choose one or more)"
-                ] and len(val_str) < 80:
-                    class_name = val_str
-                    break
-            if not class_name:
-                class_name = "UnnamedClass"
-
-            classes[class_name] = {
-                'description': desc if desc else f"Auto-generated class for {class_name}",
+            current_class = attribute_name
+            classes[current_class] = {
+                'description': description,
                 'attributes': {}
             }
-            current_class = class_name
             continue
 
-        if current_class is not None:
-           
-            attr_name = None
+        if current_class is None:
+            continue  
 
-         
-            for col_key in ["Complex type", "Data type", "Allowed values"]:
-                candidate = row.get(col_key, "").strip()
-       
-                if candidate and 1 < len(candidate) < 60:
-                    attr_name = candidate
-                    break
-
-            if not attr_name:
-          
-                attr_name = f"{current_class}_attr_{row.get('Tier','')}"
-
-            is_required = (mm == 'Y')
-
-            attr_info = {
-                'description': desc,
-                'required': is_required,
-                'multivalued': determine_multivalued(cardinality),
-                'annotations': {
-                    'cardinality': cardinality,  
-                    'M&M': mm
-                }
+        attr = {
+            'description': description,
+            'required': required,
+            'multivalued': determine_multivalued(cardinality),
+            'annotations': {
+                'tier': int(tier) if tier.isdigit() else tier,
+                'Required': required  
             }
+        }
 
-            
-            dt_lower = data_type.lower()
-            if "enum" in dt_lower:
-                possible_enum = row.get("Complex type", "").strip() or row.get("Data type", "").strip()
-                if possible_enum in yaml_dict['enums']:
-                    attr_info['range'] = f"microscopy.{possible_enum}"
-                else:
-                    attr_info['range'] = "string"
-            elif "float with unit" in dt_lower:
-                attr_info['range'] = "microscopy.float_with_unit"
-            elif "percentfraction with unit:none" in dt_lower:
-                attr_info['range'] = "microscopy.percentFraction_with_unit_none"
-            elif "positivefloat with unit" in dt_lower:
-                attr_info['range'] = "microscopy.positiveFloat_with_unit"
-            elif "extension of reference" in dt_lower:
-                attr_info['range'] = "microscopy.Extension_of_Reference"
-            elif "ldis" in dt_lower:
-                attr_info['range'] = "microscopy.LDIS"
-            else:
-                attr_info['range'] = "string"
+        if complex_type:
+            corrected_complex_type = complex_type.replace('ManufactuerSpecs', 'ManufacturerSpecs').replace('Linkht', 'Light').replace('Filtr', 'Filter').replace('Beamsplitteris', 'Beamsplitter is').replace('componewnt', 'component')
+            attr['range'] = f'microscopy.{corrected_complex_type}'
+        elif allowed_values:
+            enum_name = attribute_name
+            attr['range'] = f'microscopy.{enum_name}'
+        else:
+            type_mapping = {
+                'string': 'string',
+                'float': 'float',
+                'float with unit:DiameterUnit': 'microscopy.float_with_unit',
+                'float with unit:RadiusOfCurvatureUnit': 'microscopy.float_with_unit',
+                'float with unit:AngleOfIncidenceUnit': 'microscopy.float_with_unit',
+                'float with unit:WavelengthUnit': 'microscopy.float_with_unit',
+                'percentFraction with unit:none': 'microscopy.percentFraction_with_unit',
+                'boolean': 'boolean',
+                'Extension of Reference': 'microscopy.Extension_of_Reference',
+                'Denomination': 'microscopy.Denomination',
+                'LSID': 'microscopy.LSID',
+                'nonNegativeFloat': 'microscopy.nonNegativeFloat',
+                'positiveFloat with unit:WavelengthUnit': 'microscopy.positiveFloat_with_unit',
+                'float_with_unit': 'microscopy.float_with_unit',
+                'percentFraction_with_unit': 'microscopy.percentFraction_with_unit'
+            }
+            attr['range'] = type_mapping.get(data_type.lower(), 'string')
 
-            classes[current_class]['attributes'][attr_name] = attr_info
+        classes[current_class]['attributes'][attribute_name] = attr
 
-    for cls_name, cls_obj in classes.items():
-        yaml_dict['classes'][cls_name] = cls_obj
+    for class_name, class_info in classes.items():
+        yaml_dict['classes'][class_name] = class_info
 
    
+    if 'Instrument' in classes and 'Objective' in classes:
+        yaml_dict['classes']['Instrument']['attributes']['Objective'] = {
+            'description': "The Microscope's Objective lens consists of a lens, its mount, and any associated parts. It is the part of the imaging system, which forms a primary image of the object, either alone or in conjunction with a tube lens. The Objective typically consists of a compound lens consisting of several simple lenses (elements), usually arranged along a common axis.",
+            'range': 'microscopy.Objective',
+            'required': True,
+            'multivalued': True,
+            'annotations': {
+                'tier': 1,
+                'Required': True
+            }
+        }
+
+    for class_info in yaml_dict['classes'].values():
+        for attr_name, attr_info in class_info['attributes'].items():
+            if attr_name in ['WorkingDistance', 'ObjectiveViewField', 'ImageDistance', 'CalibratedMagnification']:
+                attr_info['range'] = 'microscopy.float_with_unit'
+
+    for enum_name in yaml_dict['enums']:
+        if not yaml_dict['enums'][enum_name]['description']:
+            yaml_dict['enums'][enum_name]['description'] = f'Types of {enum_name}'
+
     yaml = YAML()
     yaml.indent(mapping=2, sequence=4, offset=2)
     yaml.preserve_quotes = True
@@ -200,7 +200,7 @@ def main():
     with open(output_yaml, 'w', encoding='utf-8') as outfile:
         yaml.dump(yaml_dict, outfile)
 
-    print(f"[INFO] Generated LinkML schema: {output_yaml}")
+    print(f"LinkML schema has been generated and saved to '{output_yaml}'.")
 
 if __name__ == "__main__":
     main()
