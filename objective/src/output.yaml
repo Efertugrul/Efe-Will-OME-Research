@@ -155,6 +155,9 @@ slots:
   cardinality:
     description: Cardinality indicating the multiplicity of the attribute
     range: string
+  multivalued:
+    description: Indicates if the attribute can have multiple values
+    range: boolean
 classes:
   Instrument:
     description: This element describes the Instrument used to capture the Image.

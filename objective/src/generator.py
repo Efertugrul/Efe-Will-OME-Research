@@ -17,7 +17,7 @@ def determine_multivalued(cardinality):
 
 def main():
     input_csv = "../data/NBO_MicroscopyMetadataSpecifications_OBJECTIVE_v02-10.csv" 
-    output_yaml = 'output.yaml' 
+    output_yaml = 'output2.yaml' 
 
     yaml_dict = {
         'id': 'https://example.org/MicroscopyMetadata',
