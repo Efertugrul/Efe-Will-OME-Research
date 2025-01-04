@@ -114,7 +114,7 @@ def main():
         attribute_name = row['AttributeName'].strip()
         description = row['Description'].strip()
         tier = row.get('Tier', row.get('\ufeffTier', '')).strip() 
-        required = row['Required?'].strip().upper() == 'Y'
+        required = row['M&M'].strip().upper() == 'Y'
         allowed_values = row['Allowed values'].strip()
         complex_type = row['Complex type'].strip()
         cardinality = row['Cardinality/Required?'].strip()
@@ -136,7 +136,7 @@ def main():
             'multivalued': determine_multivalued(cardinality),
             'annotations': {
                 'tier': int(tier) if tier.isdigit() else tier,
-                'Required': required  
+                'M&M': required  
             }
         }
 
@@ -180,7 +180,7 @@ def main():
             'multivalued': True,
             'annotations': {
                 'tier': 1,
-                'Required': True
+                'M&M': True
             }
         }
 
