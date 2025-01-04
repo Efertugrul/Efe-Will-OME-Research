@@ -4,23 +4,15 @@ from collections import defaultdict
 from ruamel.yaml import YAML
 
 def parse_csv(file_path):
-    """
-    Reads the CSV file and returns a list of dictionaries,
-    one for each row, keyed by column headers (the same as the raw CSV).
-    """
+  
     with open(file_path, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
         return list(reader)
 
 def determine_multivalued(cardinality):
-    """
-    Returns True if the CSV row's 'Cardinality/Required?' suggests a multi-valued slot
-    (e.g. '1..∞', '1 ... ∞', 'Many', 'multi', etc.).
-    Adjust or expand logic as needed.
-    """
+   
     if not cardinality:
         return False
-    # cardinality_lower = cardinality.lower()
     return '...' in cardinality or '∞' in cardinality or 'multi' in cardinality.lower()
 
 def main():

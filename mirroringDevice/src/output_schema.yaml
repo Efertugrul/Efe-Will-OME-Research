@@ -33,7 +33,7 @@ types:
     base: float
     description: A positive floating-point number with an optional unit
 enums:
-  'Substitution: choose one child from the list below':
+  MirroringDevice-APE:
     description: This element describes a Mirror positioned in the Light Path for
       one or more Channels available for this Instrument. An Instrument may have several
       Mirrors of different types, such as Dichroic, Beamsplitter or Reflector. This
@@ -199,7 +199,7 @@ classes:
         annotations:
           tier: 1
           Required: true
-        range: 'microscopy.Substitution: choose one child from the list below'
+        range: microscopy.MirroringDevice-APE
       Manufacturer:
         description: The company, research group or individual who manufactured this
           hardware component.
