@@ -165,7 +165,7 @@ slots:
   tier:
     description: Tier level indicating the depth or importance
     range: integer
-  Required:
+  M&M:
     description: Indicates if the attribute is required
     range: boolean
   cardinality:
@@ -198,7 +198,7 @@ classes:
         multivalued: true
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: microscopy.MirroringDevice-APE
       Manufacturer:
         description: The company, research group or individual who manufactured this
@@ -207,7 +207,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: string
       Model:
         description: The Model name or any other designation the Manufacturer uses
@@ -216,7 +216,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: string
       CatalogNumber:
         description: The Catalog, Part or Serial Number used by the Manufacturer to
@@ -225,7 +225,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: string
       LotNumber:
         description: The Lot Number used by the Manufacturer to refer to a specific
@@ -234,7 +234,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       ManufactuerSpecs:
         description: Additional ManufactuerSpecs attributes and Sub-elements are listed
@@ -243,7 +243,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       ID:
         description: A Unique Identifier for this component.
@@ -251,7 +251,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: false
+          M&M: false
         range: string
       Name:
         description: A User-defined Name for this component.
@@ -259,7 +259,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: false
+          M&M: false
         range: string
       OpticsHolderPosition:
         description: This field records the position of this Mirroring Device in an
@@ -268,7 +268,7 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: string
       MirrorType:
         description: This field records the general category of this Mirror.
@@ -276,7 +276,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.MirrorType
       Geometry:
         description: This field records the geometrical shape of the surface(s) of
@@ -285,7 +285,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.MirrorGeometry
       Diameter:
         description: This field describes the Diameter of this optical element.
@@ -293,7 +293,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       RadiusOfCurvature:
         description: The radius of curvature of this Mirror. A spherical lens or Mirror
@@ -305,7 +305,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       AngleOfIncidence:
         description: This field records the optimal angle of incidence (AOI) for this
@@ -316,7 +316,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       SubstrateType:
         description: This field records the type of Substrate that is used for this
@@ -325,7 +325,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       SubstrateMaterial:
         description: This field records the chemical composition or the designation
@@ -336,7 +336,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.OpticalMaterialName
       GlassCode:
         description: If available, this field records the international Glass Code
@@ -351,7 +351,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       AnnotationRef:
         description: This is an empty element that refers to an Annotation (typically
@@ -361,7 +361,7 @@ classes:
         multivalued: true
         annotations:
           tier: 1
-          Required: false
+          M&M: false
         range: string
       Dichroic-APE:
         description: A Dichroic Mirror (also often referred to as Dichroic Beamsplitter,
@@ -376,7 +376,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: string
       Type:
         description: This field captures the Type of Dichroic used in this case.
@@ -384,7 +384,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: microscopy.FilterType
       CoatingMethod:
         description: This field records the type of Coating used in this case. An
@@ -395,7 +395,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: microscopy.CoatingMethod
       LightPathLocation:
         description: 'This field records the location of this component in the Microscope
@@ -405,7 +405,7 @@ classes:
         multivalued: false
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: microscopy.LightPathLocationOptions
       Technology:
         description: This field records the filtering Technology utilized for this
@@ -415,7 +415,7 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: microscopy.FilterTechnologyType
       AttenuationMethod:
         description: This field records the mean by which this optical element achieves
@@ -424,7 +424,7 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: microscopy.AttenuationMethodType
       AttenuationCoefficient:
         description: This field records the Attenuation Coefficient (AC) of this optical
@@ -438,7 +438,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       Thickness:
         description: This field describes the Thickness of this optical element.
@@ -446,7 +446,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       Polarization:
         description: This field records the polarization effect of this optical element.
@@ -457,7 +457,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.FilterPolarizationType
       TransmittanceRange:
         description: This element records the Range (also known as Band) of Wavelengths
@@ -467,7 +467,7 @@ classes:
         multivalued: true
         annotations:
           tier: 1
-          Required: true
+          M&M: true
         range: string
       Wavelength:
         description: This field records the key Wavelength that characterizes this
@@ -480,7 +480,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       Transmittance:
         description: This field records the maximum amount of light this optical component
@@ -490,7 +490,7 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: string
       FWHMBandwidth:
         description: This field records the width of this Reflectance Range (also
@@ -503,7 +503,7 @@ classes:
         multivalued: false
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       ReflectanceRange:
         description: This element records the Range (also known as Band) of Wavelengths
@@ -513,7 +513,7 @@ classes:
         multivalued: true
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: string
       Reflectance:
         description: The field records the maximum amount of light this Mirror is
@@ -523,7 +523,7 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: microscopy.float_with_unit
       TransmittanceProfileFile:
         description: This element represents a file in .csv or other suitable formats
@@ -532,7 +532,7 @@ classes:
         multivalued: true
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.FileAnnotation
       ReflectanceProfileFile:
         description: This element represents a file in .csv or other suitable formats
@@ -541,7 +541,7 @@ classes:
         multivalued: true
         annotations:
           tier: 3
-          Required: false
+          M&M: false
         range: microscopy.FileAnnotation
       ReflectingMirror:
         description: This element describes a total reflection Mirror.
@@ -549,5 +549,5 @@ classes:
         multivalued: false
         annotations:
           tier: 2
-          Required: false
+          M&M: false
         range: string

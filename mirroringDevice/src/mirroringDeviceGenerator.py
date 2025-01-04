@@ -114,7 +114,7 @@ def main():
         attribute_name = row['AttributeName'].strip()
         description = row['Description'].strip()
         tier = row.get('Tier', row.get('\ufeffTier', '')).strip() 
-        required = row['M&M'].strip().upper() == 'Y'
+        required = row['Required?'].strip().upper() == 'Y'
         allowed_values = row['Allowed values'].strip()
         complex_type = row['Complex type'].strip()
         cardinality = row['Cardinality/Required?'].strip()
