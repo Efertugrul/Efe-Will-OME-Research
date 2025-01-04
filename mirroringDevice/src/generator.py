@@ -69,7 +69,7 @@ def main():
                 'description': 'Tier level indicating the depth or importance',
                 'range': 'integer'
             },
-            'Required': { 
+            'M&M': { 
                 'description': 'Indicates if the attribute is required',
                 'range': 'boolean'
             },
