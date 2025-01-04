@@ -17,7 +17,7 @@ def determine_multivalued(cardinality):
 
 def main():
     input_csv = "../data/mirrorDev_correct.csv"  
-    output_yaml = 'output_schema.yaml'            
+    output_yaml = 'mirroringDeviceOutput.yaml'
 
     yaml_dict = {
         'id': 'https://example.org/MicroscopyMetadata',  
