@@ -1,0 +1,7 @@
+pandas
+openpyxl
+pyyaml
+requests
+xsdata
+linkml-runtime
+xmlschema 
