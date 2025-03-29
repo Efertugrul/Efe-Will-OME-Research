@@ -119,38 +119,47 @@ For help on any script, use the `-h` or `--help` option:
 
 ### Schema Validation
 
-After generating the LinkML schemas, you can validate them to ensure they conform to LinkML standards and have no errors.
+The project now includes a robust schema validation pipeline that checks the generated LinkML schemas for correctness and consistency. The validation process performs:
 
-#### Using Python Directly
+1. **YAML Syntax Checking**: Validates the basic structure and syntax of YAML files.
+2. **LinkML Compliance**: Ensures adherence to LinkML schema standards (when LinkML is available).
+3. **Reference Validation**: Verifies that all references between classes and slots are valid.
+4. **Type Checking**: Confirms that all types are properly defined.
+5. **Inheritance Validation**: Validates inheritance relationships between classes.
 
-To validate a single schema file:
+### Validation Features
 
-```bash
-python -m src.validate_schema ome_schema.yaml -v
-```
+- **Graceful Degradation**: Falls back to basic YAML validation when LinkML is not available
+- **Comprehensive Reporting**: Generates detailed Markdown reports of validation results
+- **Flexible Usage**: Can validate individual schemas or entire directories
+- **Command-line Interface**: Simple usage through the CLI or the provided shell script
 
-To validate all schemas in a directory:
+### Limitations
 
-```bash
-python -m src.validate_schema ome_schemas/ --output validation_report.md -v
-```
+- **Full Validation Requires LinkML**: Some validation checks only work when LinkML is installed
+- **Performance**: Validating large schema collections may be time-consuming
+- **Basic Mode**: When LinkML is unavailable, only basic YAML syntax is checked
 
-#### Complete Pipeline: Generation and Validation
+### Usage
 
-For a complete pipeline that generates schemas and then validates them, use:
+The validation can be run as part of the full pipeline:
 
 ```bash
 ./generate_and_validate.sh
 ```
 
-Options:
-- `-o, --output DIR`: Output directory for schemas (default: ome_schemas)
-- `-r, --report FILE`: File for validation report (default: validation_report.md)
-- `-s, --single`: Generate a single schema instead of partitioning
-- `-v, --verbose`: Enable verbose output
-- `-x, --xsd PATH`: Path to OME XSD file (default: data/ome.xsd)
+Or directly on schemas or directories:
 
-This will automatically generate LinkML schemas and validate them, creating a report with any validation errors found.
+```bash
+python -m src.validate_schema path/to/schema.yaml --output report.md
+python -m src.validate_schema path/to/schema_directory --output report.md
+```
+
+Skip validation in the pipeline with:
+
+```bash
+./generate_and_validate.sh --no-validate
+```
 
 ### Windows Compatibility
 
@@ -184,18 +193,6 @@ The code handles complex features like:
 - Documentation extraction
 - Attribute type mapping
 - Enumeration values
-
-### Validation Process
-
-The schema validation component performs the following checks:
-
-1. **YAML Syntax Checking**: Validates that the schemas are properly formatted YAML
-2. **LinkML Compliance**: Confirms that schemas follow LinkML standards
-3. **Reference Validation**: Verifies that all references to classes and slots are valid
-4. **Type Checking**: Ensures that all types are properly defined
-5. **Inheritance Validation**: Checks that inheritance relationships are correctly specified
-
-The validation generates a detailed report of any issues found, categorized by severity and type.
 
 ## Testing
 
