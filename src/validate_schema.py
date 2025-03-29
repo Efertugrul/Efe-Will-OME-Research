@@ -17,10 +17,15 @@ from typing import List, Optional, Dict, Any, Tuple
 
 # Import LinkML validation tools
 try:
+    # Try standard import path first
     from linkml_runtime.loaders import yaml_loader
     from linkml_runtime.utils.schemaview import SchemaView
     from linkml_runtime.utils.validate_yaml import validate_yaml
-    from linkml.validators.jsonschemavalidator import JsonSchemaValidator
+    try:
+        from linkml.validators.jsonschemavalidator import JsonSchemaValidator
+    except ImportError:
+        # Some installations use different module names
+        from linkml_runtime.validators.jsonschemavalidator import JsonSchemaValidator
 except ImportError:
     print("Error: LinkML packages not found. Please install them with:")
     print("pip install linkml linkml-runtime")
