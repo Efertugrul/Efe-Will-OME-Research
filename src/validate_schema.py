@@ -15,25 +15,50 @@ import yaml
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 
-# Import LinkML validation tools
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Import LinkML validation tools with better error handling
+linkml_imports_ok = False
+yaml_loader = None
+SchemaView = None
+JsonSchemaValidator = None
+
 try:
     # Try standard import path first
     from linkml_runtime.loaders import yaml_loader
     from linkml_runtime.utils.schemaview import SchemaView
-    from linkml_runtime.utils.validate_yaml import validate_yaml
+    
+    # Some LinkML versions have validate_yaml in different locations
+    try:
+        from linkml_runtime.utils.validate_yaml import validate_yaml
+    except ImportError:
+        try:
+            from linkml.utils.validate_yaml import validate_yaml
+        except ImportError:
+            validate_yaml = None
+            logger.warning("LinkML validate_yaml not available")
+    
+    # JsonSchemaValidator can be in different locations depending on LinkML version
     try:
         from linkml.validators.jsonschemavalidator import JsonSchemaValidator
     except ImportError:
-        # Some installations use different module names
-        from linkml_runtime.validators.jsonschemavalidator import JsonSchemaValidator
-except ImportError:
-    print("Error: LinkML packages not found. Please install them with:")
-    print("pip install linkml linkml-runtime")
-    sys.exit(1)
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+        try:
+            from linkml_runtime.validators.jsonschemavalidator import JsonSchemaValidator
+        except ImportError:
+            # Fall back to running without JsonSchemaValidator
+            JsonSchemaValidator = None
+            logger.warning("LinkML JsonSchemaValidator not available - using basic validation only")
+    
+    linkml_imports_ok = True
+    logger.info("LinkML imports successful")
+except ImportError as e:
+    logger.warning(f"LinkML import error: {str(e)}")
+    logger.warning("Using basic YAML validation only")
+    print("Warning: LinkML packages not found. Using basic YAML validation only.")
+    print("For full validation, install LinkML with: pip install linkml linkml-runtime")
+    # We'll continue without LinkML and do basic YAML validation
 
 def validate_schema_file(schema_file: str, verbose: bool = False) -> Tuple[bool, List[str]]:
     """
@@ -69,6 +94,11 @@ def validate_schema_file(schema_file: str, verbose: bool = False) -> Tuple[bool,
         except yaml.YAMLError as e:
             errors.append(f"YAML syntax error in {schema_file}: {str(e)}")
             return False, errors
+        
+        # If LinkML is not available, just do basic YAML validation
+        if not linkml_imports_ok:
+            logger.info(f"Basic YAML validation passed for {schema_file}")
+            return True, []
             
         # Load schema with LinkML
         logger.debug(f"Loading schema with LinkML: {schema_file}")
@@ -128,16 +158,17 @@ def validate_schema_file(schema_file: str, verbose: bool = False) -> Tuple[bool,
                         errors.append(f"Slot {slot_name} references undefined range {range_type}")
         
         # Run LinkML validators if available
-        try:
-            validator = JsonSchemaValidator(schema_file)
-            validation_results = validator.validate()
-            if not validation_results.valid:
-                for error in validation_results.results:
-                    errors.append(f"LinkML validation error: {error}")
-        except Exception as e:
-            logger.debug(f"Could not use JsonSchemaValidator: {str(e)}")
-            # Fall back to basic validation
-            pass
+        if JsonSchemaValidator is not None:
+            try:
+                validator = JsonSchemaValidator(schema_file)
+                validation_results = validator.validate()
+                if not validation_results.valid:
+                    for error in validation_results.results:
+                        errors.append(f"LinkML validation error: {error}")
+            except Exception as e:
+                logger.debug(f"Could not use JsonSchemaValidator: {str(e)}")
+                # Fall back to basic validation
+                pass
         
         if errors:
             return False, errors
@@ -203,11 +234,20 @@ def generate_validation_report(results: Dict[str, Tuple[bool, List[str]]], outpu
     report = []
     report.append("# LinkML Schema Validation Report")
     report.append("")
-    report.append(f"## Summary")
+    report.append("## Summary")
     report.append("")
     report.append(f"- Total schemas validated: {total_count}")
     report.append(f"- Valid schemas: {valid_count}")
     report.append(f"- Invalid schemas: {total_count - valid_count}")
+    
+    # Add LinkML availability info
+    report.append("")
+    if linkml_imports_ok:
+        report.append("LinkML imports were successful. Full validation performed.")
+    else:
+        report.append("**Warning:** LinkML packages not available. Only basic YAML syntax validation was performed.")
+        report.append("Install LinkML for more thorough validation: `pip install linkml linkml-runtime`")
+    
     report.append("")
     
     if total_count - valid_count > 0:
@@ -249,39 +289,49 @@ def main():
     # Parse arguments
     args = parser.parse_args()
     
+    # Print warning if LinkML is not available
+    if not linkml_imports_ok:
+        logger.warning("LinkML packages not available. Using basic YAML validation only.")
+        logger.warning("Install LinkML for full validation: pip install linkml linkml-runtime")
+        print("")
+    
     # Check if path is a file or directory
     if os.path.isfile(args.path):
         # Validate single file
         is_valid, errors = validate_schema_file(args.path, args.verbose)
         results = {args.path: (is_valid, errors)}
         
+        # Generate report if requested
+        if args.output:
+            generate_validation_report(results, args.output)
+        
         # Print results
         if is_valid:
             logger.info(f"✓ {args.path} is valid")
-            if args.output:
-                generate_validation_report(results, args.output)
             return 0
         else:
             logger.error(f"✗ {args.path} has {len(errors)} errors:")
             for error in errors:
                 logger.error(f"  - {error}")
-            if args.output:
-                generate_validation_report(results, args.output)
             return 1
     
     elif os.path.isdir(args.path):
         # Validate directory
         results = validate_schema_directory(args.path, args.verbose)
         
-        # Generate report
+        # Generate report if requested
         if args.output:
             generate_validation_report(results, args.output)
         
-        # Return appropriate exit code
-        if all(is_valid for is_valid, _ in results.values()):
-            return 0
-        else:
+        # Check if any schema is invalid
+        if not results:
+            # No files found or error in directory
+            logger.warning(f"No YAML files found or directory error in {args.path}")
             return 1
+        
+        # Return appropriate exit code
+        all_valid = all(is_valid for is_valid, _ in results.values())
+        return 0 if all_valid else 1
     
     else:
         logger.error(f"Path not found: {args.path}")
