@@ -4,4 +4,5 @@ pyyaml
 requests
 xsdata
 linkml-runtime
-xmlschema 
+xmlschema
+linkml>=1.5.0 

@@ -34,12 +34,15 @@ The converter extracts elements, attributes, types, and relationships from the O
 ├── 📂 src                  # Source code
 │   ├── download_xsd.py     # Script to download OME XSD file
 │   ├── generator.py        # LinkML schema generator
+│   ├── validate_schema.py  # Schema validation script
 │   └── xsdtojson.py        # XSD to JSON Schema converter
 ├── 📂 tests                # Test files
 │   └── ...                 # Various test modules
 ├── download_xsd.sh         # Shell script for downloading XSD
 ├── generate_element_schema.sh # Shell script for generating element schemas
 ├── generate_full_schema.sh # Shell script for generating complete schema
+├── generate_and_validate.sh # Pipeline for generation and validation
+├── validation_report.md    # Generated validation report
 ├── README.md               # This documentation
 └── requirements.txt        # Python dependencies
 ```
@@ -114,6 +117,41 @@ For help on any script, use the `-h` or `--help` option:
 ./generate_full_schema.sh --help
 ```
 
+### Schema Validation
+
+After generating the LinkML schemas, you can validate them to ensure they conform to LinkML standards and have no errors.
+
+#### Using Python Directly
+
+To validate a single schema file:
+
+```bash
+python -m src.validate_schema ome_schema.yaml -v
+```
+
+To validate all schemas in a directory:
+
+```bash
+python -m src.validate_schema ome_schemas/ --output validation_report.md -v
+```
+
+#### Complete Pipeline: Generation and Validation
+
+For a complete pipeline that generates schemas and then validates them, use:
+
+```bash
+./generate_and_validate.sh
+```
+
+Options:
+- `-o, --output DIR`: Output directory for schemas (default: ome_schemas)
+- `-r, --report FILE`: File for validation report (default: validation_report.md)
+- `-s, --single`: Generate a single schema instead of partitioning
+- `-v, --verbose`: Enable verbose output
+- `-x, --xsd PATH`: Path to OME XSD file (default: data/ome.xsd)
+
+This will automatically generate LinkML schemas and validate them, creating a report with any validation errors found.
+
 ### Windows Compatibility
 
 If you're using Windows, you can run the shell scripts using:
@@ -138,6 +176,7 @@ The conversion process works in three main stages:
 1. **XSD Parsing**: The OME XSD is parsed using the xmlschema library
 2. **JSON Schema Conversion**: XSD elements are converted to a JSON Schema representation
 3. **LinkML Generation**: The JSON Schema is transformed into LinkML YAML format
+4. **Schema Validation**: Generated LinkML schemas are validated for correctness and consistency
 
 The code handles complex features like:
 - Element inheritance and extension
@@ -145,6 +184,18 @@ The code handles complex features like:
 - Documentation extraction
 - Attribute type mapping
 - Enumeration values
+
+### Validation Process
+
+The schema validation component performs the following checks:
+
+1. **YAML Syntax Checking**: Validates that the schemas are properly formatted YAML
+2. **LinkML Compliance**: Confirms that schemas follow LinkML standards
+3. **Reference Validation**: Verifies that all references to classes and slots are valid
+4. **Type Checking**: Ensures that all types are properly defined
+5. **Inheritance Validation**: Checks that inheritance relationships are correctly specified
+
+The validation generates a detailed report of any issues found, categorized by severity and type.
 
 ## Testing
 
