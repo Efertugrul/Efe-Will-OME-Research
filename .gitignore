@@ -58,15 +58,13 @@ test_schemas/
 test_partitioned_schemas/
 *.yaml
 
+# Project specific files to ignore
+changelog.txt
+project_summary.txt
+dev_notes.txt
+
 # Exceptions - track these configuration files
 !pytest.ini
 !requirements*.txt
 !README.md
-!LICENSE
-!changelog.txt
-!project_summary.txt
-
-# Project specific
-dev_notes.txt
-changelog.txt
-project_summary.txt 
+!LICENSE 
